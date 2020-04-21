@@ -6,7 +6,6 @@ import os
 import time
 
 from pythx import Client
-from pythx.conf import config
 from pythx.api.handler import APIHandler
 from pythx.middleware.analysiscache import AnalysisCacheMiddleware
 from pythx.middleware.toolname import ClientToolNameMiddleware
@@ -51,16 +50,15 @@ def main():
     create_parser(parser)
     args = parser.parse_args()
 
-    config["endpoints"]["production"] = args.api_url
-
     handler = APIHandler(
         middlewares=[
             ClientToolNameMiddleware(name="ApiTests"),
             AnalysisCacheMiddleware(no_cache=args.no_cache),
-        ]
+        ],
+        api_url = args.api_url
     )
     logging.info(f"Running MythX API tests without cache: {args.no_cache}")
-    c = Client(eth_address=ETH_ADDRESS, password=PASSWORD, handler=handler)
+    c = Client(username=ETH_ADDRESS, password=PASSWORD, handler=handler)
     logging.info(f"Submit analysis to API: {args.api_url}")
     resp = c.analyze(**API_PAYLOAD)
     logging.info(resp.to_dict())
